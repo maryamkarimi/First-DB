@@ -1,0 +1,29 @@
+-- Connect to (use) mkarimifassign2db
+USE mkarimifassign2db;
+
+-- Show the data in all of the tables 
+SELECT * FROM product;
+SELECT * FROM agent;
+SELECT * FROM customer;
+SELECT * FROM purchases;
+
+-- Create a view that shows the customer first name and last name, the description of the products they have bought, the quantity of the products they have bought, the price of the product and a total cost to purchase that many items of each product. Order the view by the last name. 
+CREATE VIEW customer_purchase_info AS SELECT firstname,lastname,description,quantity,cost,quantity*cost AS total FROM customer,product,purchases WHERE customer.customerid=purchases.customerID AND product.pid = purchases.pID ORDER BY lastname;
+
+-- Prove that the view works by selecting all the rows from it. 
+SELECT * FROM customer_purchase_info;
+
+-- Select only the rows from the view where customers spent more than 100 dollars. 
+SELECT * FROM customer_purchase_info WHERE total>100;
+
+-- Delete the product that I made up
+DELETE FROM product WHERE description="Tshirt";
+
+-- Prove that the delete worked.
+SELECT * FROM product;
+
+-- Delete all agents who are from Springfield.
+DELETE FROM agent WHERE City="Springfield";
+
+-- the row for agent 99 (Hugh Grant) was not deleted with the SQL command above since agentid is a foreign key in the customer table and it is specified to be NOT NULL. Thus, if we try to remove an agent who deals with customers, we get an error.
+

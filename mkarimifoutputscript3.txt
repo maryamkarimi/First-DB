@@ -1,0 +1,188 @@
+--------------
+SELECT description FROM product
+--------------
+
++---------------+
+| description   |
++---------------+
+| Bike          |
+| Socks         |
+| Tshirt        |
+| Pants         |
+| Bag           |
+| Shoes         |
+| Leggings      |
+| Elbow pads    |
+| Knee Pads     |
+| Roller Blades |
+| Helmet        |
++---------------+
+--------------
+SELECT DISTINCT(city) FROM customer
+--------------
+
++-------------+
+| city        |
++-------------+
+| Boston      |
+| Springfield |
+| Kypto       |
+| Providence  |
++-------------+
+--------------
+SELECT * FROM agent ORDER BY city
+--------------
+
++---------+-----------+-----------+-------------+------------+
+| agentid | firstName | lastName  | city        | comPercent |
++---------+-----------+-----------+-------------+------------+
+| 33      | David     | Letterman | Bedrock     |        100 |
+| 11      | Regis     | Philbin   | Boston      |         33 |
+| 25      | Maryam    | Karimi    | London      |         80 |
+| 22      | Courtney  | Cox       | New York    |         25 |
+| 12      | Rosie     | Cox       | Ottawa      |         50 |
+| 66      | Rosie     | ODonnell  | Ottawa      |        100 |
+| 99      | Hugh      | Grant     | Springfield |         16 |
++---------+-----------+-----------+-------------+------------+
+--------------
+SELECT firstName,lastName FROM customer WHERE city="Springfield"
+--------------
+
++-----------+----------+
+| firstName | lastName |
++-----------+----------+
+| Monty     | Burns    |
+| Homer     | Simpson  |
+| Sideshow  | Bob      |
++-----------+----------+
+--------------
+SELECT lastName FROM customer WHERE agentID = (SELECT agentid FROM agent WHERE firstName="Regis")
+--------------
+
++------------+
+| lastName   |
++------------+
+| Rubble     |
+| Flintstone |
++------------+
+--------------
+SELECT description FROM product WHERE description LIKE '%pad%' OR description LIKE '%Pad%'
+--------------
+
++-------------+
+| description |
++-------------+
+| Elbow pads  |
+| Knee Pads   |
++-------------+
+--------------
+SELECT lastName,description,quantity FROM customer,product,purchases WHERE (customer.customerid=purchases.customerID AND product.pid = purchases.pID)
+--------------
+
++------------+-------------+----------+
+| lastName   | description | quantity |
++------------+-------------+----------+
+| Griffens   | Elbow pads  |       19 |
+| Flintstone | Elbow pads  |        2 |
+| Flintstone | Knee Pads   |        2 |
+| Simpson    | Helmet      |       20 |
+| Simpson    | Socks       |       14 |
+| Simpson    | Elbow pads  |       10 |
+| Bob        | Helmet      |        5 |
+| Bob        | Socks       |        5 |
+| Bob        | Knee Pads   |        5 |
+| Bob        | Elbow pads  |        5 |
++------------+-------------+----------+
+--------------
+SELECT SUM(quantity) AS "Homer's Total Purchases" FROM purchases WHERE customerID=(SELECT customerid FROM customer WHERE firstName="Homer")
+--------------
+
++-------------------------+
+| Homer's Total Purchases |
++-------------------------+
+|                      44 |
++-------------------------+
+--------------
+SELECT firstname,lastname,SUM(quantity) FROM customer,purchases WHERE customer.customerid = purchases.customerID GROUP BY purchases.customerid
+--------------
+
++-----------+------------+---------------+
+| firstname | lastname   | SUM(quantity) |
++-----------+------------+---------------+
+| Peter     | Griffens   |            19 |
+| Fred      | Flintstone |             4 |
+| Homer     | Simpson    |            44 |
+| Sideshow  | Bob        |            20 |
++-----------+------------+---------------+
+--------------
+SELECT description,num FROM product WHERE pid NOT IN (SELECT pID FROM purchases)
+--------------
+
++---------------+------+
+| description   | num  |
++---------------+------+
+| Bike          |  200 |
+| Tshirt        |  100 |
+| Pants         |   40 |
+| Bag           |   20 |
+| Shoes         |  128 |
+| Leggings      |  200 |
+| Roller Blades |   89 |
++---------------+------+
+--------------
+SELECT description,num FROM product WHERE pid NOT IN (SELECT pID FROM purchases WHERE customerID = (SELECT customerid FROM customer WHERE firstname="Fred" AND lastname="Flintstone"))
+--------------
+
++---------------+------+
+| description   | num  |
++---------------+------+
+| Bike          |  200 |
+| Socks         |  100 |
+| Tshirt        |  100 |
+| Pants         |   40 |
+| Bag           |   20 |
+| Shoes         |  128 |
+| Leggings      |  200 |
+| Roller Blades |   89 |
+| Helmet        |   30 |
++---------------+------+
+--------------
+SELECT agent.firstname AS "First Name(A)", agent.lastname AS "Last Name(A)", customer.firstname AS "First Name(C)", customer.lastname AS "Last Name(C)" FROM agent,customer WHERE agent.city = customer.city AND customer.agentid = agent.agentid
+--------------
+
++---------------+--------------+---------------+--------------+
+| First Name(A) | Last Name(A) | First Name(C) | Last Name(C) |
++---------------+--------------+---------------+--------------+
+| Regis         | Philbin      | Barney        | Rubble       |
+| Regis         | Philbin      | Fred          | Flintstone   |
+| Hugh          | Grant        | Monty         | Burns        |
+| Hugh          | Grant        | Homer         | Simpson      |
++---------------+--------------+---------------+--------------+
+--------------
+SELECT SUM(quantity) AS "Total Knee Pads Sold" FROM purchases WHERE pID = (SELECT pid FROM product WHERE description="Knee Pads")
+--------------
+
++----------------------+
+| Total Knee Pads Sold |
++----------------------+
+|                    7 |
++----------------------+
+--------------
+SELECT description FROM product WHERE pid in (SELECT pID FROM purchases GROUP BY pID HAVING COUNT(customerID)>3)
+--------------
+
++-------------+
+| description |
++-------------+
+| Elbow pads  |
++-------------+
+--------------
+SELECT firstname,lastname FROM agent WHERE agentid IN (SELECT agentid FROM customer WHERE agent.agentid = customer.agentid AND customerid IN (SELECT customerid FROM customer WHERE customerid IN (SELECT customerID FROM purchases WHERE pID = (SELECT pID FROM product WHERE description = "Knee Pads"))))
+--------------
+
++-----------+----------+
+| firstname | lastname |
++-----------+----------+
+| Rosie     | ODonnell |
+| Regis     | Philbin  |
++-----------+----------+

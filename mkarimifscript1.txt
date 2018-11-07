@@ -1,0 +1,38 @@
+-- List all the current databases owned by me
+SHOW DATABASES;
+
+-- Delete the database called mkarimifassign2db if it exists
+DROP DATABASE IF EXISTS mkarimifassign2db;
+
+-- Create a database called mkarimifassign2db
+CREATE DATABASE mkarimifassign2db;
+
+-- Connect to (use) mkarimifassign2db
+USE mkarimifassign2db;
+
+-- Make sure the t.a. has access to my database in order to mark this assignment
+GRANT USAGE ON *.* TO 'ta'@'localhost';
+DROP USER 'ta'@'localhost';
+CREATE USER 'ta'@'localhost' IDENTIFIED BY 'cs3319';
+GRANT ALL PRIVILEGES ON yourwesternuseridassign2db.* TO 'ta'@'localhost';
+FLUSH PRIVILEGES;
+
+-- List all the tables (should be none initially)
+SHOW TABLES;
+
+-- Create table agent where it has an id (primary key), first name, last name, city, and commission percentage 
+CREATE TABLE agent(agentid CHAR(2), firstName CHAR(30), lastName CHAR(30),city CHAR(15),comPercent TINYINT, PRIMARY KEY(agentid));
+
+-- Create table customer where it has an id (primary key), first name, last name, city, phone number, and a foreign key agentid ( id of the agent who deals with this customer)
+CREATE TABLE customer(customerid CHAR(2), firstName CHAR(30), lastName CHAR(30), city CHAR(15), phone CHAR(12),agentID CHAR(2) NOT NULL, PRIMARY KEY (customerid), FOREIGN KEY (agentID) REFERENCES agent(agentid));
+
+-- Create table product where it has an id (primary key), description, cost and quantity on hand 
+CREATE TABLE product(pid CHAR(2),description CHAR(20), cost FLOAT, num INT, PRIMARY KEY(pid));
+
+-- Create table purchases where it has two foreign keys (customer id and product id) and quantity of a product purchased by a customer 
+CREATE TABLE purchases(customerID CHAR(2), pID CHAR(2), quantity INT, FOREIGN KEY (customerID) REFERENCES customer(customerid), FOREIGN KEY (pID) REFERENCES product(pid));
+
+-- List the tables again to make sure all tables are created
+SHOW TABLES;
+
+

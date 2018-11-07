@@ -1,0 +1,47 @@
+USE mkarimifassign2db;
+
+-- Query 1 : Show the description of all the products
+SELECT description FROM product;
+
+-- Query 2 : Show the city of all customers with no repeats
+SELECT DISTINCT(city) FROM customer;
+
+-- Query 3 : Show all the data in the agent table, but show them in order of their cities
+SELECT * FROM agent ORDER BY city;
+
+-- Query 4 : Show the first and last name of all customers from Springfield
+SELECT firstName,lastName FROM customer WHERE city="Springfield";
+
+-- Query 5 : List the last name of all customers who deal with Regis
+SELECT lastName FROM customer WHERE agentID = (SELECT agentid FROM agent WHERE firstName="Regis");
+
+-- Query 6 : List the description of any product with the letters "pad" or "Pad" in the description name
+SELECT description FROM product WHERE description LIKE '%pad%' OR description LIKE '%Pad%';
+
+-- Query 7 : For any customer who has actually purchased products, list the last name of each customer, the description of each product they have purchase and the quantity they have purchased of that product
+SELECT lastName,description,quantity FROM customer,product,purchases WHERE (customer.customerid=purchases.customerID AND product.pid = purchases.pID);
+
+-- Query 8 : Find the total number of products purchased by Homer. Search using his first name, not his customer id.  Just display the amount but give it a title of "Homer's Total Purchases" when the query is run. 
+SELECT SUM(quantity) AS "Homer's Total Purchases" FROM purchases WHERE customerID=(SELECT customerid FROM customer WHERE firstName="Homer");
+
+-- Query 9 : For any customer who has actually purchased products, find the total number of products purchased by each customer, print out the first and last name of the customer and their total number of  purchases.
+SELECT firstname,lastname,SUM(quantity) FROM customer,purchases WHERE customer.customerid = purchases.customerID GROUP BY purchases.customerid;
+
+-- Query 10 : List the descriptions and quantity on hand of any products that have not been purchased by anyone
+SELECT description,num FROM product WHERE pid NOT IN (SELECT pID FROM purchases);
+
+-- Query 11 : List the description and quantity of any product that has not been purchase by Fred Flintstone (referencing his name in the query, both first and last)
+SELECT description,num FROM product WHERE pid NOT IN (SELECT pID FROM purchases WHERE customerID = (SELECT customerid FROM customer WHERE firstname="Fred" AND lastname="Flintstone"));
+
+-- Query 12 : List the first and last name of any agent and customer where the agent deals with a customer from the same city as the agent.
+SELECT agent.firstname AS "First Name(A)", agent.lastname AS "Last Name(A)", customer.firstname AS "First Name(C)", customer.lastname AS "Last Name(C)" FROM agent,customer WHERE agent.city = customer.city AND customer.agentid = agent.agentid;
+
+-- Query 13 : List the total number of knee pads that have been purchase.
+SELECT SUM(quantity) AS "Total Knee Pads Sold" FROM purchases WHERE pID = (SELECT pid FROM product WHERE description="Knee Pads");
+
+-- Query 14 : Find all products  (description) which have been purchased by more than 3 customers 
+SELECT description FROM product WHERE pid in (SELECT pID FROM purchases GROUP BY pID HAVING COUNT(customerID)>3);
+
+-- Query 15 : Find the first name and last name of all agents who deal with customers that have purchased knee pads.
+SELECT firstname,lastname FROM agent WHERE agentid IN (SELECT agentid FROM customer WHERE agent.agentid = customer.agentid AND customerid IN (SELECT customerid FROM customer WHERE customerid IN (SELECT customerID FROM purchases WHERE pID = (SELECT pID FROM product WHERE description = "Knee Pads"))));
+
